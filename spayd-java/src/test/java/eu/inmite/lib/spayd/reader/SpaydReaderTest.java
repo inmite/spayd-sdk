@@ -40,7 +40,6 @@ public class SpaydReaderTest {
 		assertNotNull("result is null", result);
 		assertNotNull("payment is null with errors " + result.getErrors(), result.getPayment());
 		assertNull(result.getErrors());
-		assertNull(result.getThrowable());
 		assertTrue(result.isSuccess());
 		assertTrue(result.isValid());
 	}
