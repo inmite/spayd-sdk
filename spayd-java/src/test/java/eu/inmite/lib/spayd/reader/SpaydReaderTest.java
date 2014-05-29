@@ -47,12 +47,12 @@ public class SpaydReaderTest {
 
 	@Test
 	public void testIsSpayd() throws Exception {
-		assertTrue(SpaydReader.isSmartPlatba(validCode1));
-		assertTrue(SpaydReader.isSmartPlatba(validCode2));
-		assertTrue(SpaydReader.isSmartPlatba(validCode3));
+		assertTrue(SpaydReader.isSpayd(validCode1));
+		assertTrue(SpaydReader.isSpayd(validCode2));
+		assertTrue(SpaydReader.isSpayd(validCode3));
 
-		assertFalse(SpaydReader.isSmartPlatba(invalidCode1));
-		assertFalse(SpaydReader.isSmartPlatba(invalidCode2));
+		assertFalse(SpaydReader.isSpayd(invalidCode1));
+		assertFalse(SpaydReader.isSpayd(invalidCode2));
 	}
 
 	@Test

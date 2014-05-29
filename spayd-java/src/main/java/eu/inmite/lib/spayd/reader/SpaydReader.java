@@ -16,21 +16,20 @@ import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
 /**
+ * Reader for spayd strings. Initialize with {@link eu.inmite.lib.spayd.reader.SpaydConfig} and call {@link #readFromSpayd(String)} method.
+ *
  * @author Tomas Vondracek
  */
 public final class SpaydReader<T extends Payment> {
 
-	// static
 	protected static final Pattern mPayloadPattern = Pattern.compile("SPD\\*[0-9]\\.[0-9]\\*.+\\*?");
 
 	private final SpaydConfig<T> mConfiguration;
 
-	private static final String SUPPORTED_VERSION = "1.0";
-
 	/**
 	 * Check if given string is valid SPAYD payload
 	 */
-	public static boolean isSmartPlatba(String content) {
+	public static boolean isSpayd(String content) {
 		if (content == null || content.length() == 0) {
 			return false;
 		}
@@ -48,9 +47,15 @@ public final class SpaydReader<T extends Payment> {
 		mConfiguration = configuration;
 	}
 
+	/**
+	 * Read Spayd string and create {@link eu.inmite.lib.spayd.model.Payment} object.
+	 * @param spayd spayd string
+	 *
+	 * @return result with created {@link eu.inmite.lib.spayd.model.Payment} in case of success or collection of errors occurred while reading and validating the spayd
+	 */
 	@NotNull
 	public ReaderResult<T> readFromSpayd(String spayd) {
-		if (! isSmartPlatba(spayd)) {
+		if (! isSpayd(spayd)) {
 			return ReaderResult.fail();
 		}
 		final Collection<SpaydValidationError> spaydErrors = mConfiguration.getValidator().validatePaymentString(spayd);
