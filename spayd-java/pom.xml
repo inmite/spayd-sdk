@@ -9,7 +9,7 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>spayd-sdk</artifactId>
+	<artifactId>spayd-sdk-java</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -24,7 +24,6 @@
 			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
-
 
 
 		<dependency>
