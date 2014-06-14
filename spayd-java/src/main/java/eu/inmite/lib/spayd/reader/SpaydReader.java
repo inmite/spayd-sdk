@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -104,17 +103,6 @@ public final class SpaydReader<T extends Payment> {
 	private static String percentDecode(String content) {
 		try {
 			return URLDecoder.decode(content, "utf-8");
-		} catch (UnsupportedEncodingException uee) {
-			return null;
-		}
-	}
-
-	/**
-	 * Create URL-encoded string
-	 */
-	private static String percentEncode(String content) {
-		try {
-			return URLEncoder.encode(content, "utf-8");
 		} catch (UnsupportedEncodingException uee) {
 			return null;
 		}

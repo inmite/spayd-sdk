@@ -14,15 +14,15 @@ public class ReaderResult<T extends Payment> {
 	private final Collection<SpaydValidationError> mErrors;
 	private final T mPayment;
 
-	public static <T extends Payment> ReaderResult<T> fail() {
+	static <T extends Payment> ReaderResult<T> fail() {
 		return fail((Collection<SpaydValidationError>) null);
 	}
 
-	public static <T extends Payment> ReaderResult<T> fail(final Collection<SpaydValidationError> errors) {
+	static <T extends Payment> ReaderResult<T> fail(final Collection<SpaydValidationError> errors) {
 		return new ReaderResult<>(false, errors, null);
 	}
 
-	public static <T extends Payment> ReaderResult<T> success(final T payment) {
+	static <T extends Payment> ReaderResult<T> success(final T payment) {
 		return new ReaderResult<>(true, null, payment);
 	}
 

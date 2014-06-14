@@ -205,16 +205,17 @@ public class SpaydReaderTest {
 
 	@Test
 	public void testPerformance() throws Exception {
-		final String spayd = "SPD*1.0*ACC:CZ5855000000001265098001*MSG:123456789 123456789 123456789 123456789 123456789 123456789";
+		final String spayd = "SPD*1.0*ACC:CZ5855000000001265098001*AM:123.00*MSG:123456789 123456789 123456789 123456789 123456789 123456789*CC:CZK*RF:1234567890123456";
 
 		final long start = System.currentTimeMillis();
 		int attempt = 0;
-		while (attempt < 1000) {
+		final int loops = 1000;
+		while (attempt < loops) {
 			mSpayd.readFromSpayd(spayd);
 			attempt++;
 		}
 		final long time = System.currentTimeMillis() - start;
 
-		System.out.println("time[ms]: " + time);
+		System.out.println("time for " + loops + " loops [ms]: " + time);
 	}
 }

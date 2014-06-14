@@ -26,12 +26,30 @@ public class FormattingUtils {
 		}
 
 		if (dateFormat == null) {
-			dateFormat = new SimpleDateFormat("yyyymmdd");
+			dateFormat = new SimpleDateFormat("yyyyMMdd");
 		}
 		if (tz != null) {
 			dateFormat.setTimeZone(tz);
+		} else {
+			dateFormat.setTimeZone(TimeZone.getDefault());
 		}
 		return dateFormat.parse(date);
+	}
+
+	public static String formatSpaydDate(Date date, TimeZone tz) throws ParseException {
+		if (date == null) {
+			return null;
+		}
+
+		if (dateFormat == null) {
+			dateFormat = new SimpleDateFormat("yyyyMMdd");
+		}
+		if (tz != null) {
+			dateFormat.setTimeZone(tz);
+		} else {
+			dateFormat.setTimeZone(TimeZone.getDefault());
+		}
+		return dateFormat.format(date);
 	}
 
 

@@ -1,21 +1,33 @@
 package eu.inmite.lib.spayd.model;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * @author Tomas Vondracek
  */
 public enum SpaydNotificationChannel {
 
-	None,
-	Phone,
-	Email;
+	None(null),
+	Phone("P"),
+	Email("E");
+
+	private final String mSpaydUnit;
+
+	SpaydNotificationChannel(final String spaydUnit) {
+		mSpaydUnit = spaydUnit;
+	}
 
 	public static SpaydNotificationChannel fromSpayd(String spaydUnit) {
-		if ("E".equals(spaydUnit)) {
+		if (Email.mSpaydUnit.equals(spaydUnit)) {
 			return Email;
-		} else if ("P".equals(spaydUnit)) {
+		} else if (Phone.mSpaydUnit.equals(spaydUnit)) {
 			return Phone;
 		}
 		return None;
 	}
 
+	@Nullable
+	public String getSpaydUnit() {
+		return mSpaydUnit;
+	}
 }

@@ -109,7 +109,6 @@ public abstract class Payment<T extends BankAccount> {
 			return null;
 		}
 
-		// url decoder will replace '+' for space
 		final String[] parts = ibanAndBic.split("\\+");
 		if (parts.length == 0) {
 			return null;
