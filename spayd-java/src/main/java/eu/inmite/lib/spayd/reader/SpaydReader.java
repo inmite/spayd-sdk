@@ -65,11 +65,11 @@ public final class SpaydReader<T extends Payment> {
 		final String[] contentParts = spayd.split("\\*");
 
 		final Map<String, String> attributes = new HashMap<>();
-		for (String part : contentParts) {
+		// skip SPD*1.0*
+		for (int i = 2; i < contentParts.length; i++) {
+			final String part = contentParts[i];
 			final int separatorIndex = part.indexOf(":");
-			if (separatorIndex < 1 || separatorIndex >= part.length()) {
-				continue;
-			}
+
 			final String key = part.substring(0, separatorIndex);
 			String encodedValue = part.substring(separatorIndex + 1);
 			if (encodedValue.contains("+")) {
