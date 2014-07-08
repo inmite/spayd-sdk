@@ -32,7 +32,7 @@ public class SpaydWriterTest {
 
 	@Test
 	public void testIban() throws Exception {
-		final WriterResult result = mWriter.write(SpaydOptions.create()
+		final WriterResult result = mWriter.write(SpaydOptions.createDefault()
 				.withAccount(new BankAccount("CZ5855000000001265098001")));
 
 		assertResult(result, "SPD*1.0*ACC:CZ5855000000001265098001");
@@ -40,7 +40,7 @@ public class SpaydWriterTest {
 
 	@Test
 	public void testIbanBIC() throws Exception {
-		final WriterResult result = mWriter.write(SpaydOptions.create()
+		final WriterResult result = mWriter.write(SpaydOptions.createDefault()
 				.withAccount(new BankAccount("CZ5855000000001265098001", "RZBCCZPP")));
 
 		assertResult(result, "SPD*1.0*ACC:CZ5855000000001265098001+RZBCCZPP");
@@ -48,7 +48,7 @@ public class SpaydWriterTest {
 
 	@Test
 	public void testAttributes() throws Exception {
-		final WriterResult result = mWriter.write(SpaydOptions.create()
+		final WriterResult result = mWriter.write(SpaydOptions.createDefault()
 				.withAccount(new BankAccount("CZ5855000000001265098001"))
 				.withAmount(new BigDecimal("100.55"))
 				.withCurrencyCode("USD")

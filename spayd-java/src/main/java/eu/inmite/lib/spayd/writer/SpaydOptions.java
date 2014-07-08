@@ -2,6 +2,8 @@ package eu.inmite.lib.spayd.writer;
 
 import eu.inmite.lib.spayd.model.BankAccount;
 import eu.inmite.lib.spayd.model.SpaydNotificationChannel;
+import eu.inmite.lib.spayd.writer.impl.CzechSpaydOptions;
+import eu.inmite.lib.spayd.writer.impl.DefaultSpaydOptions;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
@@ -15,29 +17,42 @@ import static eu.inmite.lib.spayd.utilities.FormattingUtils.formatSpaydDate;
 /**
  * @author Tomas Vondracek
  */
-public class SpaydOptions {
+public abstract class SpaydOptions<T extends SpaydOptions<T>> {
 
-	protected final String mVersion;
+	public static DefaultSpaydOptions createDefault() {
+		return DefaultSpaydOptions.create("1.0", null);
+	}
+
+	public static DefaultSpaydOptions createDefault(String version) {
+		return DefaultSpaydOptions.create(version, null);
+	}
+
+	public static DefaultSpaydOptions createDefault(String version, TimeZone timeZone) {
+		return DefaultSpaydOptions.create(version, timeZone);
+	}
+
+	public static CzechSpaydOptions createCzech() {
+		return CzechSpaydOptions.create("1.0", null);
+	}
+
+	public static CzechSpaydOptions createCzech(String version) {
+		return CzechSpaydOptions.create(version, null);
+	}
+
+	public static CzechSpaydOptions createCzech(String version, TimeZone timeZone) {
+		return CzechSpaydOptions.create(version, timeZone);
+	}
+
+	private final String mVersion;
+	private final Map<String, String> mAttributes = new LinkedHashMap<>();
 	protected final TimeZone mTimeZone;
 
-	private final Map<String, String> mAttributes = new LinkedHashMap<>();
-
-	public static SpaydOptions create() {
-		return new SpaydOptions("1.0", null);
-	}
-
-	public static SpaydOptions create(String version) {
-		return new SpaydOptions(version, null);
-	}
-
-	public static SpaydOptions create(String version, TimeZone timeZone) {
-		return new SpaydOptions(version, timeZone);
-	}
-
-	private SpaydOptions(final String version, final TimeZone timeZone) {
+	public SpaydOptions(final String version, final TimeZone timeZone) {
 		mVersion = version;
 		mTimeZone = timeZone;
 	}
+
+	protected abstract T self();
 
 	String getVersion() {
 		return mVersion;
@@ -47,10 +62,10 @@ public class SpaydOptions {
 		return mAttributes;
 	}
 
-	public SpaydOptions withAttribute(final boolean encode, String key, String value) {
+	public T withAttribute(final boolean encode, String key, String value) {
 		final String spaydUnit = encode ? percentEncode(value ) : value;
 		mAttributes.put(key, spaydUnit);
-		return this;
+		return self();
 	}
 
 	/**
@@ -64,7 +79,7 @@ public class SpaydOptions {
 		}
 	}
 
-	private String formatAccount(BankAccount account) {
+	private static String formatAccount(BankAccount account) {
 		if (account.getBic() != null) {
 			return account.getIban().concat("+").concat(account.getBic());
 		} else {
@@ -72,11 +87,13 @@ public class SpaydOptions {
 		}
 	}
 
-	public SpaydOptions withAccount(final @NotNull BankAccount account) {
+	/// attributes ///
+
+	public T withAccount(final @NotNull BankAccount account) {
 		return withAttribute(false, "ACC", formatAccount(account));
 	}
 
-	public SpaydOptions withAlternateAccounts(final Collection<BankAccount> alternateAccounts) {
+	public T withAlternateAccounts(final Collection<BankAccount> alternateAccounts) {
 		final StringBuilder builder = new StringBuilder();
 		for (BankAccount account : alternateAccounts) {
 			if (builder.length() > 0) {
@@ -87,26 +104,26 @@ public class SpaydOptions {
 		return withAttribute(false, "ALT-ACC", builder.toString());
 	}
 
-	public SpaydOptions withAmount(final BigDecimal amount) {
+	public T withAmount(final BigDecimal amount) {
 		if (amount == null) {
-			return this;
+			return self();
 		}
 		return withAttribute(false, "AM", amount.toString());
 	}
 
-	public SpaydOptions withCurrencyCode(final String currencyCode) {
+	public T withCurrencyCode(final String currencyCode) {
 		return withAttribute(false, "CC", currencyCode);
 	}
 
-	public SpaydOptions withIdentifierForReceiver(final String identifierForReceiver) {
+	public T withIdentifierForReceiver(final String identifierForReceiver) {
 		return withAttribute(false, "RF", identifierForReceiver);
 	}
 
-	public SpaydOptions withReceiversName(final String receiversName) {
+	public T withReceiversName(final String receiversName) {
 		return withAttribute(true, "RN", receiversName);
 	}
 
-	public SpaydOptions withDueDate(final Date dueDate) {
+	public T withDueDate(final Date dueDate) {
 		try {
 			return withAttribute(false, "DT", formatSpaydDate(dueDate, mTimeZone));
 		} catch (ParseException e) {
@@ -114,19 +131,19 @@ public class SpaydOptions {
 		}
 	}
 
-	public SpaydOptions withPaymentType(final String paymentType) {
+	public T withPaymentType(final String paymentType) {
 		return withAttribute(false, "PT", paymentType);
 	}
 
-	public SpaydOptions withMessageForReceiver(final String messageForReceiver) {
+	public T withMessageForReceiver(final String messageForReceiver) {
 		return withAttribute(true, "MSG", messageForReceiver);
 	}
 
-	public SpaydOptions withNotificationChannel(final SpaydNotificationChannel notificationChannel) {
+	public T withNotificationChannel(final SpaydNotificationChannel notificationChannel) {
 		return withAttribute(false, "NT", notificationChannel.getSpaydUnit());
 	}
 
-	public SpaydOptions withNotificationAddress(final String notificationAddress) {
+	public T withNotificationAddress(final String notificationAddress) {
 		return withAttribute(true, "NTA", notificationAddress);
 	}
 }

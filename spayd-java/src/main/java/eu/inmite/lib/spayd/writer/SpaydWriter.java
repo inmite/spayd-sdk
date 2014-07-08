@@ -38,7 +38,7 @@ public class SpaydWriter {
 		}
 
 		final StringBuilder builder = new StringBuilder("SPD*");
-		builder.append(options.mVersion);
+		builder.append(options.getVersion());
 		for (Map.Entry<String, String> entry : attributes.entrySet()) {
 			if (entry.getValue() != null) {
 				builder.append("*");
