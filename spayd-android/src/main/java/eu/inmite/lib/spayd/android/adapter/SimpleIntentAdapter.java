@@ -2,7 +2,7 @@ package eu.inmite.lib.spayd.android.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import eu.inmite.lib.spayd.android.Constants;
+import eu.inmite.lib.spayd.android.IntentConstants;
 import eu.inmite.lib.spayd.android.ISpaydIntentAdapter;
 import eu.inmite.lib.spayd.reader.SpaydReader;
 
@@ -18,7 +18,7 @@ public class SimpleIntentAdapter implements ISpaydIntentAdapter {
 		}
 
 		if (containsSpayd(intent, context)) {
-			final String payload = intent.getStringExtra(Constants.INTENT_EXTRA_SPAYD);
+			final String payload = intent.getStringExtra(IntentConstants.EXTRA_SPAYD);
 
 			if (SpaydReader.isSpayd(payload)) {
 				return payload;
@@ -29,8 +29,8 @@ public class SimpleIntentAdapter implements ISpaydIntentAdapter {
 
 	@Override
 	public boolean containsSpayd(Intent intent, Context context) {
-		if (intent != null && intent.getExtras() != null && intent.getExtras().containsKey(Constants.INTENT_EXTRA_SPAYD)) {
-			final String payload = intent.getStringExtra(Constants.INTENT_EXTRA_SPAYD);
+		if (intent != null && intent.getExtras() != null && intent.getExtras().containsKey(IntentConstants.EXTRA_SPAYD)) {
+			final String payload = intent.getStringExtra(IntentConstants.EXTRA_SPAYD);
 
 			return SpaydReader.isSpayd(payload);
 		}

@@ -16,22 +16,22 @@ public class IntentIntegratorTest {
 	@Test
 	public void testContainsSpayd() throws Exception {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setType(Constants.INTENT_MIME_TYPE);
+		intent.setType(IntentConstants.MIME_TYPE);
 		assertFalse(IntentIntegrator.containsSpayd(intent, Robolectric.application));
 
-		intent.putExtra(Constants.INTENT_EXTRA_SPAYD, "not a spayd");
+		intent.putExtra(IntentConstants.EXTRA_SPAYD, "not a spayd");
 		assertFalse(IntentIntegrator.containsSpayd(intent, Robolectric.application));
 
-		intent.putExtra(Constants.INTENT_EXTRA_SPAYD, "SPD*1.0*ACC:CZ5855000000001265098001*");
+		intent.putExtra(IntentConstants.EXTRA_SPAYD, "SPD*1.0*ACC:CZ5855000000001265098001*");
 		assertTrue(IntentIntegrator.containsSpayd(intent, Robolectric.application));
 	}
 
 	@Test
 	public void testGetSpaydFromIntent() throws Exception {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setType(Constants.INTENT_MIME_TYPE);
+		intent.setType(IntentConstants.MIME_TYPE);
 		final String spayd = "SPD*1.0*ACC:CZ5855000000001265098001*";
-		intent.putExtra(Constants.INTENT_EXTRA_SPAYD, spayd);
+		intent.putExtra(IntentConstants.EXTRA_SPAYD, spayd);
 
 		final String spaydFromIntent = IntentIntegrator.getSpaydFromIntent(intent, Robolectric.application);
 		assertEquals(spayd, spaydFromIntent);
@@ -43,9 +43,9 @@ public class IntentIntegratorTest {
 		final Intent intent = IntentIntegrator.createIntentForSpayd(spayd);
 
 		assertEquals(Intent.ACTION_VIEW, intent.getAction());
-		assertEquals(Constants.INTENT_MIME_TYPE, intent.getType());
+		assertEquals(IntentConstants.MIME_TYPE, intent.getType());
 		assertNotNull(intent.getExtras());
-		assertTrue(intent.getExtras().containsKey(Constants.INTENT_EXTRA_SPAYD));
-		assertEquals(spayd, intent.getStringExtra(Constants.INTENT_EXTRA_SPAYD));
+		assertTrue(intent.getExtras().containsKey(IntentConstants.EXTRA_SPAYD));
+		assertEquals(spayd, intent.getStringExtra(IntentConstants.EXTRA_SPAYD));
 	}
 }

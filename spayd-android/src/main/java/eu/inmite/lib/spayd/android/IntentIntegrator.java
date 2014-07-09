@@ -23,8 +23,8 @@ public class IntentIntegrator {
 		}
 
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.putExtra(Constants.INTENT_EXTRA_SPAYD, spayd);
-		intent.setType(Constants.INTENT_MIME_TYPE);
+		intent.putExtra(IntentConstants.EXTRA_SPAYD, spayd);
+		intent.setType(IntentConstants.MIME_TYPE);
 
 		return intent;
 	}
