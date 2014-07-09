@@ -123,7 +123,7 @@ public abstract class Payment<T extends BankAccount> {
 		return version;
 	}
 
-	public BankAccount getAccount() {
+	public T getAccount() {
 		return account;
 	}
 
