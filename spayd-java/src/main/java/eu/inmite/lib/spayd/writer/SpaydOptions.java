@@ -63,8 +63,10 @@ public abstract class SpaydOptions<T extends SpaydOptions<T>> {
 	}
 
 	public T withAttribute(final boolean encode, String key, String value) {
-		final String spaydUnit = encode ? percentEncode(value ) : value;
-		mAttributes.put(key, spaydUnit);
+		if (key != null && value != null && value.length() > 0) {
+			final String spaydUnit = encode ? percentEncode(value ) : value;
+			mAttributes.put(key, spaydUnit);
+		}
 		return self();
 	}
 
