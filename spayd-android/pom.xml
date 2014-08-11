@@ -6,11 +6,11 @@
 		<groupId>eu.inmite.android.lib</groupId>
 		<artifactId>spayd-sdk-parent</artifactId>
 		<relativePath>../pom.xml</relativePath>
-		<version>1.0.0</version>
+		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>spayd-sdk-android</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>SPAYD SDK for Android</name>
@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>eu.inmite.android.lib</groupId>
 			<artifactId>spayd-sdk-java</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>
