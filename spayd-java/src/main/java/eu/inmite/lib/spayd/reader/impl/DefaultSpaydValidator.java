@@ -3,6 +3,7 @@
  */
 package eu.inmite.lib.spayd.reader.impl;
 
+import eu.inmite.lib.spayd.model.Frequency;
 import eu.inmite.lib.spayd.model.SpaydValidationError;
 import eu.inmite.lib.spayd.reader.ISpaydValidator;
 import eu.inmite.lib.spayd.utilities.IBANValidator;
@@ -13,6 +14,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static eu.inmite.lib.spayd.model.SpaydValidationError.*;
+
 /**
  *
  * @author petrdvorak
@@ -20,6 +23,8 @@ import java.util.*;
 public class DefaultSpaydValidator implements ISpaydValidator {
 
 	private static final Set<String> ALLOWED_KEYS = new HashSet<>(12);
+
+	private static final Set<String> SUPPORTED_VERSIONS = new HashSet<>(2);
 
 	static {
 		ALLOWED_KEYS.add("ACC");
@@ -29,14 +34,18 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 		ALLOWED_KEYS.add("RF");
 		ALLOWED_KEYS.add("RN");
 		ALLOWED_KEYS.add("DT");
+		ALLOWED_KEYS.add("FRQ");
+		ALLOWED_KEYS.add("DL");
 		ALLOWED_KEYS.add("PT");
 		ALLOWED_KEYS.add("MSG");
 		ALLOWED_KEYS.add("NT");
 		ALLOWED_KEYS.add("NTA");
 		ALLOWED_KEYS.add("CRC32");
+
+		SUPPORTED_VERSIONS.add("1.0");
+		SUPPORTED_VERSIONS.add("2.0");
 	}
 
-	private static final String SUPPORTED_VERSION = "1.0";
 	public static final int DEFAULT_MAX_MESSAGE_LENGTH = 60;
 	public static final int MAX_RF_LENGTH = 16;
 	public static final int MAX_RN_LENGTH = 35;
@@ -57,19 +66,19 @@ public class DefaultSpaydValidator implements ISpaydValidator {
         List<SpaydValidationError> errors = new LinkedList<>();
 
         if (!Charset.forName("ISO-8859-1").newEncoder().canEncode(paymentString)) { // check encoding
-            SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_CHARSET, "Invalid charset - only ISO-8859-1 characters must be used");
+            SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_CHARSET, "Invalid charset - only ISO-8859-1 characters must be used");
             errors.add(error);
             return errors;
         }
 
         if (!paymentString.matches("^SPD\\*[0-9]+\\.[0-9]+\\*.*")) {
-            SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_NOT_SPAYD, "Invalid data prefix - SPD*{$VERSION}* expected.");
+            SpaydValidationError error = new SpaydValidationError(ERROR_NOT_SPAYD, "Invalid data prefix - SPD*{$VERSION}* expected.");
             errors.add(error);
             return errors;
         }
 
         if (!paymentString.matches("^SPD\\*[0-9]+\\.[0-9]+(\\*[0-9A-Z $%*+-.]+:[^\\*]+)+\\*?$")) {
-            SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_STRUCTURE, "Payment String code didn't pass the basic regexp validation.");
+            SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_STRUCTURE, "Payment String code didn't pass the basic regexp validation.");
             errors.add(error);
             return errors;
         }
@@ -77,13 +86,13 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 		final String[] components = paymentString.split("\\*");
 
 		if (components.length < 3) {
-			final SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_NOT_SPAYD, "String doesn't contain valid SmartPayment descriptor.");
+			final SpaydValidationError error = new SpaydValidationError(ERROR_NOT_SPAYD, "String doesn't contain valid SmartPayment descriptor.");
 			errors.add(error);
 		}
 		// SPD*1.0*ACC:...
 		final String version = components[1];
-		if (! SUPPORTED_VERSION.equals(version)) {
-			final SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_REQUEST_GENERIC, "Unknown version " + 1.0);
+		if (! SUPPORTED_VERSIONS.contains(version)) {
+			final SpaydValidationError error = new SpaydValidationError(ERROR_REQUEST_GENERIC, "Unknown version " + version);
 			errors.add(error);
 		}
 
@@ -91,7 +100,7 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 		for (int i = 2; i < components.length; i++) {
 			int index = components[i].indexOf(":");
 			if (index == -1) { // missing pair between two stars ("**")
-				SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_STRUCTURE, "Payment String code didn't pass the basic regexp validation.");
+				SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_STRUCTURE, "Payment String code didn't pass the basic regexp validation.");
 				errors.add(error);
 				break;
 			}
@@ -112,7 +121,7 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 		    final String value = entry.getValue();
 
 		    if (!ALLOWED_KEYS.contains(key) && !key.startsWith("X-")) {
-		        SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_KEY_FOUND, "Unknown key detected. Use 'X-' prefix to create your own key.");
+		        SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_KEY_FOUND, "Unknown key detected. Use 'X-' prefix to create your own key.");
 		        errors.add(error);
 		        continue;
 		    }
@@ -121,25 +130,25 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 				ibanFound = true;
 				final String[] parts = value.split("\\+");
 				if (parts.length == 0) {
-					SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_IBAN, "IBAN+BIC pair was not in the correct format.");
+					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_IBAN, "IBAN+BIC pair was not in the correct format.");
 					errors.add(error);
 				}
 				final String iban = parts[0];
 				if (!IBANValidator.validateElectronicIBAN(iban)) {
-					SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_IBAN, "IBAN+BIC pair was not in the correct format.");
+					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_IBAN, "IBAN+BIC pair was not in the correct format.");
 					errors.add(error);
 				}
 
 			} else if (key.equals("ALT-ACC")) {
 				ibanFound = true;
 				if (!value.matches("^([A-Z]{2,2}[0-9]+)(\\+([A-Z0-9]+))?(,([A-Z]{2,2}[0-9]+)(\\+([A-Z0-9]+))?)*$")) {
-					SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_ALTERNATE_IBAN, "Alternate accounts are not properly formatted - should be IBAN+BIC list with items separated by ',' character.");
+					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_ALTERNATE_IBAN, "Alternate accounts are not properly formatted - should be IBAN+BIC list with items separated by ',' character.");
 					errors.add(error);
 				}
 
 			} else if (key.equals("AM")) {
 				if (!value.matches("^[0-9]{0,10}(\\.[0-9]{0,2})?$") || value.equals(".")) {
-					SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_AMOUNT, "Amount must be a number with at most 2 decimal digits.");
+					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_AMOUNT, "Amount must be a number with at most 2 decimal digits.");
 					errors.add(error);
 				}
 
@@ -147,34 +156,34 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 				try {
 					Currency.getInstance(value);
 				} catch (IllegalArgumentException ex) {
-					SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_CURRENCY, "Currency must be a valid currency from ISO 4271.");
+					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_CURRENCY, "Currency must be a valid currency from ISO 4271.");
 					errors.add(error);
 				}
 
 			} else if (key.equals("RF")) {
 				if (value.length() > MAX_RF_LENGTH || value.length() < 1 || !value.matches("^[0-9]+$")) {
-					SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_SENDERS_REFERENCE, "Senders reference must be a decimal string with length between 1 and 16 characters.");
+					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_SENDERS_REFERENCE, "Senders reference must be a decimal string with length between 1 and 16 characters.");
 					errors.add(error);
 				}
 
 			} else if (key.equals("RN")) {
 				if (value.length() > MAX_RN_LENGTH || value.length() < 1) {
 					SpaydValidationError error = new SpaydValidationError(
-							SpaydValidationError.ERROR_INVALID_RECIPIENT_NAME, "Recipient name must be a string with length between 1 and 40 characters.");
+							ERROR_INVALID_RECIPIENT_NAME, "Recipient name must be a string with length between 1 and 40 characters.");
 					errors.add(error);
 				}
 
 			} else if (key.equals("NT")) {
 				if (!value.equals("E") && !value.equals("P")) {
 					SpaydValidationError error = new SpaydValidationError(
-							SpaydValidationError.ERROR_INVALID_NOTIFICATION_TYPE, "Notification type must be 'E' (e-mail) or 'P' (phone).");
+							ERROR_INVALID_NOTIFICATION_TYPE, "Notification type must be 'E' (e-mail) or 'P' (phone).");
 					errors.add(error);
 				}
 
-			} else if (key.equals("DT")) {
+			} else if (key.equals("DT") || key.equals("DL")) {
 				if (!value.matches("^[0-9]{8,8}$")) {
 					SpaydValidationError error = new SpaydValidationError(
-							SpaydValidationError.ERROR_INVALID_DUE_DATE, "Due date must be represented as a decimal string in YYYYmmdd format.");
+							ERROR_INVALID_DUE_DATE, "Date must be represented as a decimal string in YYYYmmdd format - " + value);
 					errors.add(error);
 				} else {
 					SimpleDateFormat df = new SimpleDateFormat("yyyymmdd");
@@ -182,31 +191,35 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 					try {
 						date = df.parse(value);
 						if (date == null) {
-							SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_DUE_DATE, "Due date must be represented as a decimal string in YYYYmmdd format.");
+							SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_DUE_DATE, "Date must be represented as a decimal string in YYYYmmdd format - " + value);
 							errors.add(error);
 						}
 					} catch (ParseException ex) {
-						SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_DUE_DATE, "Due date must be represented as a decimal string in YYYYmmdd format.");
+						SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_DUE_DATE, "Date must be represented as a decimal string in YYYYmmdd format - " + value);
 						errors.add(error);
 					}
 				}
 
 			} else if (key.equals("PT")) {
 				if (value.length() > 3 || value.length() < 1) {
-					SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_PAYMENT_TYPE, "Payment type must be at represented as a string with length between 1 and 3 characters.");
+					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_PAYMENT_TYPE, "Payment type must be at represented as a string with length between 1 and 3 characters.");
 					errors.add(error);
 				}
 
 			} else if (key.equals("MSG")) {
 				if (value.length() < 1 || (maxMessageLength > 0 && value.length() > maxMessageLength)) {
-					SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_INVALID_MESSAGE, "Message must be at represented as a string with length between 1 and 60 characters.");
+					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_MESSAGE, "Message must be at represented as a string with length between 1 and 60 characters.");
 					errors.add(error);
 				}
-
+			} else if (key.equals("FRQ")) {
+				if (Frequency.fromSpaydFrequency(value) == null) {
+					SpaydValidationError error = new SpaydValidationError(ERROR_UNKNOWN_FREQUENCY, "Unknown frequency " + value);
+					errors.add(error);
+				}
 			}
 		}
 		if (!ibanFound) {
-		    SpaydValidationError error = new SpaydValidationError(SpaydValidationError.ERROR_IBAN_NOT_FOUND, "You must specify an account number.");
+		    SpaydValidationError error = new SpaydValidationError(ERROR_IBAN_NOT_FOUND, "You must specify an account number.");
 		    errors.add(error);
 		}
 		return errors;

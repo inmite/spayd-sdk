@@ -55,7 +55,7 @@ public final class SpaydReader<T extends Payment> {
 	@NotNull
 	public ReaderResult<T> readFromSpayd(String spayd) {
 		if (! isSpayd(spayd)) {
-			return ReaderResult.fail();
+			return ReaderResult.fail(Collections.singletonList(new SpaydValidationError(SpaydValidationError.ERROR_NOT_SPAYD, "invalid spayd string")));
 		}
 		final Collection<SpaydValidationError> spaydErrors = mConfiguration.getValidator().validatePaymentString(spayd);
 		if (spaydErrors.size() > 0) {

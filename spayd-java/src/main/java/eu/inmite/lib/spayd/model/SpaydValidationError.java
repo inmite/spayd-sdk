@@ -27,6 +27,7 @@ public class SpaydValidationError {
     public static String ERROR_INVALID_ALTERNATE_IBAN       = "ERROR_INVALID_ALTERNATE_IBAN";
     public static String ERROR_IBAN_NOT_FOUND               = "ERROR_IBAN_NOT_FOUND";
     public static String ERROR_INVALID_NOTIFICATION_TYPE    = "ERROR_INVALID_NOTIFICATION_TYPE";
+    public static String ERROR_UNKNOWN_FREQUENCY            = "ERROR_UNKNOWN_FREQUENCY";
     public static String ERROR_REQUEST_GENERIC              = "ERROR_REQUEST_GENERIC";
 
 	public SpaydValidationError(final String errorCode, final String errorDescription) {

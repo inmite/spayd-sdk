@@ -47,6 +47,14 @@ public abstract class Payment<T extends BankAccount> {
 	 */
 	protected final Date dueDate;
 	/**
+	 * "DL" attribute, only applicable with valid {@link #frequency}
+	 */
+	protected final Date lastDate;
+
+	/** "FRQ" attribute - frequency for standing order */
+	protected final Frequency frequency;
+
+	/**
 	 * "PT" attribute
 	 */
 	protected final String paymentType;
@@ -100,6 +108,15 @@ public abstract class Payment<T extends BankAccount> {
 		} catch (ParseException e) {
 			throw new SpaydReaderException("failed to parse date " + dateValue, e);
 		}
+
+		final String lastDateValue = attrs.get("DL");
+		try {
+			lastDate = FormattingUtils.parseSpaydDate(lastDateValue, timeZone);
+		} catch (ParseException e) {
+			throw new SpaydReaderException("failed to parse last date" + lastDateValue, e);
+		}
+
+		frequency = Frequency.fromSpaydFrequency(attrs.get("FRQ"));
 	}
 
 	protected abstract T createAccount(@NotNull String iban, @Nullable String bic);
@@ -167,6 +184,20 @@ public abstract class Payment<T extends BankAccount> {
 		return notificationAddress;
 	}
 
+	/** Last date for standing order, see also {@link #getFrequency()} */
+	public Date getLastDate() {
+		return lastDate;
+	}
+
+	/** standing order frequency */
+	public Frequency getFrequency() {
+		return frequency;
+	}
+
+	public boolean isStandingOrder() {
+		return frequency != null;
+	}
+
 	@Override
 	public String toString() {
 		return "Payment{" +
@@ -178,6 +209,8 @@ public abstract class Payment<T extends BankAccount> {
 				", identifierForReceiver='" + identifierForReceiver + '\'' +
 				", receiversName='" + receiversName + '\'' +
 				", dueDate=" + dueDate +
+				", lastDate=" + lastDate +
+				", frequency=" + frequency +
 				", paymentType='" + paymentType + '\'' +
 				", messageForReceiver='" + messageForReceiver + '\'' +
 				", notificationChannel=" + notificationChannel +

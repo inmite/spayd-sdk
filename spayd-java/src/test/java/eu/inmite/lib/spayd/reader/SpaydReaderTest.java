@@ -130,7 +130,7 @@ public class SpaydReaderTest {
 
 	@Test
 	public void testInvalidSpaydVersion() throws Exception {
-		final String codeInvalidVersion = "SPD*2.0*ACC:CZ5855000000001265098001+RZBCCZPP*AM:480.50*CC:CZK*RF:1234567890123456*X-VS:1234567890*DT:20120524*MSG:PLATBA ZA ZBOZI";
+		final String codeInvalidVersion = "SPD*9.1*ACC:CZ5855000000001265098001+RZBCCZPP*AM:480.50*CC:CZK*RF:1234567890123456*X-VS:1234567890*DT:20120524*MSG:PLATBA ZA ZBOZI";
 		final ReaderResult<Payment> result = mSpayd.readFromSpayd(codeInvalidVersion);
 
 		assertNotNull(result);

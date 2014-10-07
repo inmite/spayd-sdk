@@ -14,10 +14,6 @@ public class ReaderResult<T extends Payment> {
 	private final Collection<SpaydValidationError> mErrors;
 	private final T mPayment;
 
-	static <T extends Payment> ReaderResult<T> fail() {
-		return fail((Collection<SpaydValidationError>) null);
-	}
-
 	static <T extends Payment> ReaderResult<T> fail(final Collection<SpaydValidationError> errors) {
 		return new ReaderResult<>(false, errors, null);
 	}
