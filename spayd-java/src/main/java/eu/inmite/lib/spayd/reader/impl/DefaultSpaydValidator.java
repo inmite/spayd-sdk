@@ -50,14 +50,14 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 	public static final int MAX_RF_LENGTH = 16;
 	public static final int MAX_RN_LENGTH = 35;
 
-	private final int maxMessageLength;
+	protected final int mMaxMessageLength;
 
 	public DefaultSpaydValidator() {
 		this(DEFAULT_MAX_MESSAGE_LENGTH);
 	}
 
 	public DefaultSpaydValidator(final int maxMessageLength) {
-		this.maxMessageLength = maxMessageLength;
+		mMaxMessageLength = maxMessageLength;
 	}
 
 	@NotNull
@@ -183,19 +183,19 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 			} else if (key.equals("DT") || key.equals("DL")) {
 				if (!value.matches("^[0-9]{8,8}$")) {
 					SpaydValidationError error = new SpaydValidationError(
-							ERROR_INVALID_DUE_DATE, "Date must be represented as a decimal string in YYYYmmdd format - " + value);
+							ERROR_INVALID_DUE_DATE, "Date must be represented as a decimal string in yyyyMMdd format - " + value);
 					errors.add(error);
 				} else {
-					SimpleDateFormat df = new SimpleDateFormat("yyyymmdd");
+					SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 					Date date;
 					try {
 						date = df.parse(value);
 						if (date == null) {
-							SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_DUE_DATE, "Date must be represented as a decimal string in YYYYmmdd format - " + value);
+							SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_DUE_DATE, "Date must be represented as a decimal string in yyyyMMdd format - " + value);
 							errors.add(error);
 						}
 					} catch (ParseException ex) {
-						SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_DUE_DATE, "Date must be represented as a decimal string in YYYYmmdd format - " + value);
+						SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_DUE_DATE, "Date must be represented as a decimal string in yyyyMMdd format - " + value);
 						errors.add(error);
 					}
 				}
@@ -207,7 +207,7 @@ public class DefaultSpaydValidator implements ISpaydValidator {
 				}
 
 			} else if (key.equals("MSG")) {
-				if (value.length() < 1 || (maxMessageLength > 0 && value.length() > maxMessageLength)) {
+				if (value.length() < 1 || (mMaxMessageLength > 0 && value.length() > mMaxMessageLength)) {
 					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_MESSAGE, "Message must be at represented as a string with length between 1 and 60 characters.");
 					errors.add(error);
 				}

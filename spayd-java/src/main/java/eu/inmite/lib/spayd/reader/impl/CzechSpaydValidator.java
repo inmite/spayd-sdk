@@ -16,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static eu.inmite.lib.spayd.model.SpaydValidationError.ERROR_INVALID_MESSAGE;
+
 /**
  * @author Tomas Vondracek
  */
@@ -68,6 +70,12 @@ public class CzechSpaydValidator extends DefaultSpaydValidator {
 					}
 				} catch (NumberFormatException e) {
 					errors.add(new SpaydValidationError(ERROR_REPEAT_COUNT, "invalid attempt repeat count " + e.getMessage()));
+				}
+			} else if (key.equals("X-SELF")) {
+				final String value = entry.getValue();
+				if (value.length() < 1 || (mMaxMessageLength > 0 && value.length() > mMaxMessageLength)) {
+					SpaydValidationError error = new SpaydValidationError(ERROR_INVALID_MESSAGE, "Message must be at represented as a string with length between 1 and 60 characters.");
+					errors.add(error);
 				}
 			}
 		}

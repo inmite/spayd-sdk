@@ -16,7 +16,8 @@ public class CzechSpaydReaderTest {
 	static final String validCode3 = "SPD*1.0*ACC:CZ5855000000001265098001+RZBCCZPP*AM:480.50*CC:CZK*" +
 			"RF:1234567890123456*X-VS:1234567890*X-SS:123*X-KS:890*" +
 			"DT:20120524*MSG:PLATBA ZA ZBOZI*PT:STD*" +
-			"NT:P*NTA:608328707*RN:Tomas*X-URL:inmite.eu*X-ID:customId*X-PER:2";
+			"NT:P*NTA:608328707*RN:Tomas*X-URL:inmite.eu*X-ID:customId*X-PER:2*" +
+			"X-SELF:message for myself";
 
 	private SpaydReader<CzechPayment> mSpayd;
 
@@ -59,6 +60,7 @@ public class CzechSpaydReaderTest {
 		assertEquals("inmite.eu", payment.getCustomUrl());
 		assertEquals("customId", payment.getCustomIdentifier());
 		assertEquals(Integer.valueOf(2), payment.getRepeatDaysCount());
+		assertEquals("message for myself", payment.getMessageForSelf());
 	}
 
 	@Test

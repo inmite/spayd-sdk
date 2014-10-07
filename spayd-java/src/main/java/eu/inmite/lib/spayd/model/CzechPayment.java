@@ -19,6 +19,7 @@ public class CzechPayment extends Payment<CzechBankAccount> {
 	private final String customUrl;
 
 	private final Integer repeatDaysCount;
+	private final String messageForSelf;
 
 	public CzechPayment(final Map<String, String> spayd, final TimeZone timeZone, final String version) {
 		super(spayd, timeZone, version);
@@ -36,6 +37,7 @@ public class CzechPayment extends Payment<CzechBankAccount> {
 		} else {
 			repeatDaysCount = null;
 		}
+		messageForSelf = spayd.get("X-SELF");
 	}
 
 	@Override
@@ -65,6 +67,10 @@ public class CzechPayment extends Payment<CzechBankAccount> {
 
 	public Integer getRepeatDaysCount() {
 		return repeatDaysCount;
+	}
+
+	public String getMessageForSelf() {
+		return messageForSelf;
 	}
 
 	@Override

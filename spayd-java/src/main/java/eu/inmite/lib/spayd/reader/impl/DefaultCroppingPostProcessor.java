@@ -16,6 +16,7 @@ public class DefaultCroppingPostProcessor implements ISpaydPostProcessor {
 	public void processAttributes(final Map<String, String> mutableAttrs) {
 		tryCropAttribute(mutableAttrs, "RN", MAX_RN_LENGTH);
 		tryCropAttribute(mutableAttrs, "MSG", MAX_MSG_LENGTH);
+		tryCropAttribute(mutableAttrs, "X-SELF", MAX_MSG_LENGTH);
 	}
 
 	private void tryCropAttribute(final Map<String, String> mutableAttrs, final String attrName, final int maxLength) {
