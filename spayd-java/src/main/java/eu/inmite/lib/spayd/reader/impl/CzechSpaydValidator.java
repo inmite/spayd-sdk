@@ -14,26 +14,26 @@ package eu.inmite.lib.spayd.reader.impl;
 import eu.inmite.lib.spayd.model.SpaydValidationError;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Tomas Vondracek
  */
 public class CzechSpaydValidator extends DefaultSpaydValidator {
 
-	private static final Set<String> ALLOWED_CZECH_KEYS = new HashSet<>();
+	private static final Set<String> CZECH_SYMBOL_KEYS = new HashSet<>();
 
 	static {
-		ALLOWED_CZECH_KEYS.add("X-VS");
-		ALLOWED_CZECH_KEYS.add("X-KS");
-		ALLOWED_CZECH_KEYS.add("X-SS");
+		CZECH_SYMBOL_KEYS.add("X-VS");
+		CZECH_SYMBOL_KEYS.add("X-KS");
+		CZECH_SYMBOL_KEYS.add("X-SS");
 	}
 
+	private static final int MAX_REPEAT_COUNT = 30;
 	private static final int MAX_SYMBOL_LENGTH = 10;
 	private static final String ERROR_SYMBOL_LENGTH = "ERROR_SYMBOL_LENGTH";
+	private static final String ERROR_SYMBOL_INVALID = "ERROR_SYMBOL_INVALID";
+	private static final String ERROR_REPEAT_COUNT = "ERROR_REPEAT_ATTEMPTS_COUNT";
 
 	@NotNull
 	@Override
@@ -43,11 +43,31 @@ public class CzechSpaydValidator extends DefaultSpaydValidator {
 		for (Map.Entry<String, String> entry : attributes.entrySet()) {
 			final String key = entry.getKey();
 
-			if (ALLOWED_CZECH_KEYS.contains(key)) {
+			if (CZECH_SYMBOL_KEYS.contains(key)) {
 				final String value = entry.getValue();
 				if (value.length() > MAX_SYMBOL_LENGTH) {
 					final SpaydValidationError error = new SpaydValidationError(ERROR_SYMBOL_LENGTH, "symbol must have at most " + MAX_SYMBOL_LENGTH + " characters");
 					errors.add(error);
+				}
+				char[] valueChars = value.toCharArray();
+				for (char valueChar : valueChars) {
+					if (! Character.isDigit(valueChar)) {
+						final SpaydValidationError error = new SpaydValidationError(ERROR_SYMBOL_INVALID, "symbol must contain numeric characters only");
+						errors.add(error);
+						break;
+					}
+				}
+			} else if ("X-PER".equals(key)) {
+				final String value = entry.getValue();
+				final int repeatCount;
+				try {
+					repeatCount = Integer.parseInt(value);
+
+					if (repeatCount < 0 || repeatCount > MAX_REPEAT_COUNT) {
+						errors.add(new SpaydValidationError(ERROR_REPEAT_COUNT, "invalid attempt repeat count " + repeatCount));
+					}
+				} catch (NumberFormatException e) {
+					errors.add(new SpaydValidationError(ERROR_REPEAT_COUNT, "invalid attempt repeat count " + e.getMessage()));
 				}
 			}
 		}

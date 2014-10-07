@@ -1,7 +1,11 @@
 package eu.inmite.lib.spayd.reader;
 
+import eu.inmite.lib.spayd.model.CzechPayment;
 import eu.inmite.lib.spayd.model.Payment;
-import eu.inmite.lib.spayd.reader.impl.*;
+import eu.inmite.lib.spayd.reader.impl.CzechPaymentBuilder;
+import eu.inmite.lib.spayd.reader.impl.CzechSpaydValidator;
+import eu.inmite.lib.spayd.reader.impl.DefaultPaymentBuilder;
+import eu.inmite.lib.spayd.reader.impl.DefaultSpaydValidator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,11 +42,11 @@ public class SpaydConfig<T extends Payment> {
 		return new SpaydConfig<>(TimeZone.getDefault(), (IPaymentBuilder<P>) new DefaultPaymentBuilder(), new DefaultSpaydValidator(), processor);
 	}
 
-	public static <P extends Payment> SpaydConfig<P> czechConfig() {
-		return new SpaydConfig<>(TimeZone.getDefault(), (IPaymentBuilder<P>) new CzechPaymentBuilder(), new CzechSpaydValidator());
+	public static SpaydConfig<CzechPayment> czechConfig() {
+		return new SpaydConfig<>(TimeZone.getDefault(), new CzechPaymentBuilder(), new CzechSpaydValidator());
 	}
-	public static <P extends Payment> SpaydConfig<P> czechConfig(final TimeZone timeZone) {
-		return new SpaydConfig<>(timeZone, (IPaymentBuilder<P>) new CzechPaymentBuilder(), new CzechSpaydValidator());
+	public static SpaydConfig<CzechPayment> czechConfig(final @NotNull TimeZone timeZone) {
+		return new SpaydConfig<>(timeZone, new CzechPaymentBuilder(), new CzechSpaydValidator());
 	}
 
 	SpaydConfig(@NotNull final TimeZone timeZone,
