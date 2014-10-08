@@ -4,7 +4,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import eu.inmite.lib.spayd.android.ISpaydIntentAdapter;
+import eu.inmite.lib.spayd.android.IntentConstants;
 import eu.inmite.lib.spayd.reader.SpaydReader;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 
@@ -13,9 +16,10 @@ import java.io.*;
  */
 public class SpaydFileAdapter implements ISpaydIntentAdapter {
 
+	@Nullable
 	@Override
-	public String getSpaydFromIntent(Intent intent, Context context) {
-		if (intent == null || intent.getData() == null) {
+	public String getSpaydFromIntent(@NotNull Intent intent, @NotNull Context context) {
+		if (intent.getData() == null) {
 			return null;
 		}
 
@@ -33,8 +37,8 @@ public class SpaydFileAdapter implements ISpaydIntentAdapter {
 	}
 
 	@Override
-	public boolean containsSpayd(Intent intent, Context context) {
-		if (intent == null || intent.getData() == null || context == null) {
+	public boolean containsSpayd(@NotNull Intent intent, @NotNull Context context) {
+		if (intent.getData() == null) {
 			return false;
 		}
 		ContentResolver cr = context.getContentResolver();
@@ -45,6 +49,12 @@ public class SpaydFileAdapter implements ISpaydIntentAdapter {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Nullable
+	@Override
+	public String getPaymentSource() {
+		return IntentConstants.SOURCE_SPD;
 	}
 
 	private static String streamToString(InputStreamReader isr) throws IOException {
