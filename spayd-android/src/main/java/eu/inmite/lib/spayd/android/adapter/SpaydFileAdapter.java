@@ -3,6 +3,7 @@ package eu.inmite.lib.spayd.android.adapter;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import eu.inmite.lib.spayd.android.ISpaydIntentAdapter;
 import eu.inmite.lib.spayd.android.IntentConstants;
 import eu.inmite.lib.spayd.reader.SpaydReader;
@@ -23,16 +24,11 @@ public class SpaydFileAdapter implements ISpaydIntentAdapter {
 			return null;
 		}
 
-		ContentResolver cr = context.getContentResolver();
-		try {
-			InputStream inputStream = cr.openInputStream(intent.getData());
-			String payload = streamToString(new InputStreamReader(inputStream));
-			if (SpaydReader.isSpayd(payload)) {
-				return payload;
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		final String payload = readSpaydFromUri(context, intent.getData());
+		if (SpaydReader.isSpayd(payload)) {
+			return payload;
 		}
+
 		return null;
 	}
 
@@ -41,15 +37,10 @@ public class SpaydFileAdapter implements ISpaydIntentAdapter {
 		if (intent.getData() == null) {
 			return false;
 		}
-		ContentResolver cr = context.getContentResolver();
-		try {
-			InputStream inputStream = cr.openInputStream(intent.getData());
-			String payload = streamToString(new InputStreamReader(inputStream));
-			return SpaydReader.isSpayd(payload);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		final String payload = readSpaydFromUri(context, intent.getData());
+		return SpaydReader.isSpayd(payload);
 	}
+
 
 	@Nullable
 	@Override
@@ -57,6 +48,24 @@ public class SpaydFileAdapter implements ISpaydIntentAdapter {
 		return IntentConstants.SOURCE_SPD;
 	}
 
+	@Nullable
+	private static String readSpaydFromUri(final @NotNull Context context, final Uri uri) {
+		String payload = null;
+
+		final ContentResolver cr = context.getContentResolver();
+		InputStream inputStream = null;
+		try {
+			inputStream = cr.openInputStream(uri);
+			payload = streamToString(new InputStreamReader(inputStream));
+		} catch (IOException ignored) {
+		}
+		finally {
+			close(inputStream);
+		}
+		return payload;
+	}
+
+	@NotNull
 	private static String streamToString(InputStreamReader isr) throws IOException {
 		if (isr != null) {
 			final Writer writer = new StringWriter();
@@ -71,13 +80,19 @@ public class SpaydFileAdapter implements ISpaydIntentAdapter {
 			} catch (UnsupportedEncodingException e) {
 				return "";
 			} finally {
-				try {
-					isr.close();
-				} catch (IOException ignored) { }
+				close(isr);
 			}
 			return writer.toString();
 		} else {
 			return "";
+		}
+	}
+
+	private static void close(final @Nullable Closeable closable) {
+		if (closable != null) {
+			try {
+				closable.close();
+			} catch (IOException ignored) { }
 		}
 	}
 
