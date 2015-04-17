@@ -28,7 +28,7 @@
 	<groupId>eu.inmite.android.lib</groupId>
 	<artifactId>spayd-sdk-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>2.0.1-SNAPSHOT</version>
+	<version>2.0.1</version>
 
 	<name>SPAYD SDK Parent</name>
 	<description>SDK for Short Payment Descriptor</description>
@@ -61,7 +61,7 @@
 		<connection>scm:git:https://github.com/inmite/spayd-sdk.git</connection>
 		<developerConnection>scm:git:https://github.com/inmite/spayd-sdk.git</developerConnection>
 		<url>scm:git:https://github.com/inmite/spayd-sdk</url>
-		<tag>HEAD</tag>
+		<tag>spayd-sdk-parent-2.0.1</tag>
 	</scm>
 
 	<issueManagement>
